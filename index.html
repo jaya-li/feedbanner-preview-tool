@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedbanner Preview Tool</title>
+    <link rel="stylesheet" href="./styles.css?v=hide-phone-edge-1" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-label="Feedbanner preview workspace">
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">Feedbanner</p>
+            <h1>预览卡生成器</h1>
+          </div>
+
+          <label class="upload-zone" for="assetInput">
+            <input
+              id="assetInput"
+              type="file"
+              accept=".zip,application/zip,image/png,image/webp,image/gif,video/webm,video/quicktime,video/mp4"
+            />
+            <span class="upload-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img">
+                <path d="M12 3v12m0-12 4.5 4.5M12 3 7.5 7.5" />
+                <path d="M5 14v4a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-4" />
+              </svg>
+            </span>
+            <span>
+              <strong>上传透明底图片 / alpha video</strong>
+              <small id="fileName">支持 PNG、WebP、GIF、WebM、MOV、MP4、ZIP</small>
+            </span>
+          </label>
+
+          <div id="assetListBlock" class="section-block asset-list-block" hidden>
+            <div class="block-title">
+              <span>ZIP 素材</span>
+              <output id="assetListCount">0 个</output>
+            </div>
+            <div id="assetList" class="asset-list" aria-label="ZIP material list"></div>
+          </div>
+
+          <div class="section-block">
+            <div class="block-title">
+              <span>配色方案</span>
+              <output id="themeName">Red</output>
+            </div>
+            <div class="theme-grid" id="themeGrid" aria-label="Theme presets"></div>
+          </div>
+
+          <div class="section-block">
+            <div class="block-title">
+              <span>素材适配</span>
+              <output id="scaleValue">100%</output>
+            </div>
+            <div class="segmented" role="radiogroup" aria-label="Fit mode">
+              <button class="segment active" type="button" data-fit="contain">完整</button>
+              <button class="segment" type="button" data-fit="cover">铺满</button>
+            </div>
+            <label class="range-row">
+              <span>缩放</span>
+              <input id="scaleRange" type="range" min="50" max="180" value="100" />
+            </label>
+            <label class="range-row">
+              <span>横向</span>
+              <input id="xRange" type="range" min="-120" max="120" value="0" />
+            </label>
+            <label class="range-row">
+              <span>纵向</span>
+              <input id="yRange" type="range" min="-120" max="120" value="0" />
+            </label>
+          </div>
+
+          <div class="section-block compact">
+            <label class="toggle-row">
+              <input id="guideToggle" type="checkbox" checked />
+              <span>显示紫色定位框</span>
+            </label>
+          </div>
+
+          <div class="section-block">
+            <div class="block-title">
+              <span>批量输出</span>
+              <output id="batchCount">0 个素材</output>
+            </div>
+            <p class="batch-note">
+              ZIP 内素材会统一套用当前配色，并附当前背景图与色卡 PNG。
+            </p>
+            <progress id="batchProgress" value="0" max="1"></progress>
+            <button id="batchDownloadBtn" class="secondary-action" type="button" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <path d="M7 10l5 5 5-5" />
+                <path d="M12 15V3" />
+              </svg>
+              下载批量 ZIP
+            </button>
+            <small id="batchStatus" class="batch-status">上传 ZIP 后可批量下载</small>
+          </div>
+
+          <button id="downloadBtn" class="primary-action" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12m0 0 4-4m-4 4-4-4" />
+              <path d="M5 21h14" />
+            </svg>
+            <span id="downloadLabel">下载效果包 ZIP</span>
+          </button>
+          <a id="manualDownloadLink" class="manual-download" href="#" download hidden>手动下载刚生成的文件</a>
+          <small id="downloadStatus" class="batch-status"></small>
+        </aside>
+
+        <section class="preview-panel">
+          <div class="preview-toolbar">
+            <div>
+              <p class="eyebrow">Live Preview</p>
+              <h2>390 x 844</h2>
+            </div>
+            <button id="resetBtn" class="icon-button" type="button" aria-label="Reset placement" title="重置位置">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 12a9 9 0 1 0 3-6.7" />
+                <path d="M3 4v6h6" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="phone-stage">
+            <div id="phone" class="phone theme-red">
+              <img id="figmaBase" class="figma-base" src="./assets/figma-bases/red.png" alt="" />
+              <div class="status-bar">
+                <span>8:00</span>
+                <div class="status-icons" aria-hidden="true">
+                  <span class="signal"></span>
+                  <span class="wifi"></span>
+                  <span class="battery"></span>
+                </div>
+              </div>
+              <div class="home-nav">
+                <strong>For You</strong>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m21 21-4.3-4.3" />
+                  <circle cx="11" cy="11" r="7" />
+                </svg>
+              </div>
+
+              <div id="heroSlot" class="hero-slot">
+                <div id="emptyState" class="empty-state">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="m8 13 2.4-2.4a1.5 1.5 0 0 1 2.1 0L18 16" />
+                    <circle cx="8.5" cy="9.5" r="1.2" />
+                  </svg>
+                  <span>透明素材会出现在这里</span>
+                </div>
+                <img id="assetImage" alt="" />
+                <video id="assetVideo" playsinline muted loop preload="auto"></video>
+                <canvas id="assetVideoCanvas" aria-hidden="true"></canvas>
+                <div id="heroGuide" class="hero-guide" aria-hidden="true"></div>
+              </div>
+
+              <div class="content-area">
+                <h3>Play Unboxing Quest and get <span>4,000円分</span></h3>
+                <div class="value-card">
+                  <div class="reward-icon" aria-hidden="true">¥</div>
+                  <div>
+                    <strong>Open boxes</strong>
+                    <p>Get rewarded for each box opened!</p>
+                  </div>
+                </div>
+                <div class="cta-row">
+                  <button type="button">Not interested</button>
+                  <button type="button">Play now</button>
+                </div>
+              </div>
+
+              <div class="tabbar" aria-hidden="true">
+                <span class="tab active">Home</span>
+                <span class="tab">Friends</span>
+                <span class="plus">+</span>
+                <span class="tab">Inbox</span>
+                <span class="tab">Me</span>
+              </div>
+              <div class="home-indicator" aria-hidden="true"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+    <script src="./base-data.js"></script>
+    <script src="./app.js?v=hide-phone-edge-1"></script>
+  </body>
+</html>
