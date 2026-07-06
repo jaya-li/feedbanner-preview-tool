@@ -99,6 +99,10 @@ const themes = [
   },
 ];
 
+const PREVIEW_WIDTH = 390;
+const PREVIEW_HEIGHT = 844;
+const EXPORT_SCALE = 3;
+
 themes.forEach((theme) => {
   theme.fileSrc = theme.baseSrc;
   theme.baseSrc = window.FIGMA_BASE_DATA?.[theme.id] || theme.baseSrc;
@@ -149,7 +153,6 @@ const els = {
   batchCount: document.querySelector("#batchCount"),
   batchProgress: document.querySelector("#batchProgress"),
   batchStatus: document.querySelector("#batchStatus"),
-  resetBtn: document.querySelector("#resetBtn"),
   fitButtons: [...document.querySelectorAll("[data-fit]")],
 };
 
@@ -522,14 +525,6 @@ async function loadBatchZip(file) {
   }
 }
 
-function resetPlacement() {
-  els.scaleRange.value = "100";
-  els.xRange.value = "0";
-  els.yRange.value = "0";
-  setFit("contain");
-  syncPlacement();
-}
-
 function roundedRect(ctx, x, y, width, height, radius) {
   const r = Math.min(radius, width / 2, height / 2);
   ctx.beginPath();
@@ -771,10 +766,12 @@ async function downloadPreview() {
 }
 
 function renderPreviewCanvas(source, theme, options = {}) {
+  const renderScale = options.exportScale ?? EXPORT_SCALE;
   const canvas = document.createElement("canvas");
-  canvas.width = 390;
-  canvas.height = 844;
+  canvas.width = PREVIEW_WIDTH * renderScale;
+  canvas.height = PREVIEW_HEIGHT * renderScale;
   const ctx = canvas.getContext("2d");
+  ctx.scale(renderScale, renderScale);
   drawPreviewFrame(ctx, source, theme, options);
   return canvas;
 }
@@ -800,9 +797,9 @@ function drawPreviewFrame(ctx, source, theme, options = {}) {
 
 function drawPhoneEdgeMask(ctx) {
   ctx.save();
-  roundedRect(ctx, 1.5, 1.5, 387, 841, 29);
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = "rgba(0,0,0,0.86)";
+  roundedRect(ctx, 3, 3, 384, 838, 27);
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = "rgba(0,0,0,0.94)";
   ctx.stroke();
   ctx.restore();
 }
@@ -817,9 +814,10 @@ async function downloadVideoPreviewPackage() {
 
   updateDownloadStatus("正在录制 alpha video 预览...");
   const canvas = document.createElement("canvas");
-  canvas.width = 390;
-  canvas.height = 844;
+  canvas.width = PREVIEW_WIDTH * EXPORT_SCALE;
+  canvas.height = PREVIEW_HEIGHT * EXPORT_SCALE;
   const ctx = canvas.getContext("2d");
+  ctx.scale(EXPORT_SCALE, EXPORT_SCALE);
   const stream = canvas.captureStream(30);
   const mimeType = preferredMp4MimeType();
   if (!mimeType) throw new Error("当前浏览器不支持 MP4 视频导出，请使用支持 MP4 MediaRecorder 的新版 Chrome 或 Safari");
@@ -1241,9 +1239,10 @@ async function renderVideoFilePreview(file, theme) {
     const processedCtx = processedCanvas.getContext("2d", { willReadFrequently: true });
 
     const outputCanvas = document.createElement("canvas");
-    outputCanvas.width = 390;
-    outputCanvas.height = 844;
+    outputCanvas.width = PREVIEW_WIDTH * EXPORT_SCALE;
+    outputCanvas.height = PREVIEW_HEIGHT * EXPORT_SCALE;
     const outputCtx = outputCanvas.getContext("2d");
+    outputCtx.scale(EXPORT_SCALE, EXPORT_SCALE);
     const stream = outputCanvas.captureStream(30);
     const mimeType = preferredMp4MimeType();
     if (!mimeType) throw new Error("当前浏览器不支持 MP4 视频导出，请使用支持 MP4 MediaRecorder 的新版 Chrome 或 Safari");
@@ -1512,7 +1511,6 @@ els.heroSlot.addEventListener("click", () => {
     });
   }
 });
-els.resetBtn.addEventListener("click", resetPlacement);
 els.downloadBtn.addEventListener("click", downloadPreview);
 window.addEventListener("resize", updatePreviewScale);
 
