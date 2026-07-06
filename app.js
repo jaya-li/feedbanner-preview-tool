@@ -5,12 +5,12 @@ const themes = [
     className: "theme-red",
     baseSrc: "./assets/figma-bases/red.png",
     figmaNode: "0:1206",
-    bgStart: "#240008",
-    bgMid: "#090000",
-    bgEnd: "#3e000a",
+    bgStart: "#220006",
+    bgMid: "#000000",
+    bgEnd: "#36000A",
     panel: "rgba(255,255,255,0.12)",
-    cta: "#ff2f5f",
-    accent: "#ff2f5f",
+    cta: "#fe2c55",
+    accent: "#fe2c55",
     shadow: "rgba(255,49,95,0.35)",
   },
   {
@@ -19,12 +19,12 @@ const themes = [
     className: "theme-orange",
     baseSrc: "./assets/figma-bases/orange.png",
     figmaNode: "0:1293",
-    bgStart: "#1f0700",
-    bgMid: "#090000",
-    bgEnd: "#411600",
+    bgStart: "#220A00",
+    bgMid: "#000000",
+    bgEnd: "#4D1600",
     panel: "rgba(255,160,86,0.16)",
-    cta: "#ff6a20",
-    accent: "#ff9a4d",
+    cta: "#ff5e1c",
+    accent: "#ff5e1c",
     shadow: "rgba(255,106,32,0.34)",
   },
   {
@@ -33,12 +33,12 @@ const themes = [
     className: "theme-yellow",
     baseSrc: "./assets/figma-bases/yellow.png",
     figmaNode: "0:1380",
-    bgStart: "#1e1b00",
-    bgMid: "#090900",
-    bgEnd: "#3b3200",
+    bgStart: "#221B00",
+    bgMid: "#000000",
+    bgEnd: "#403200",
     panel: "rgba(255,218,79,0.15)",
-    cta: "#ffd12b",
-    accent: "#ffd94a",
+    cta: "#ffd63c",
+    accent: "#ffd63c",
     shadow: "rgba(255,209,43,0.32)",
   },
   {
@@ -47,12 +47,12 @@ const themes = [
     className: "theme-green",
     baseSrc: "./assets/figma-bases/green.png",
     figmaNode: "0:551",
-    bgStart: "#142100",
-    bgMid: "#090c00",
-    bgEnd: "#243d00",
+    bgStart: "#1A2200",
+    bgMid: "#000000",
+    bgEnd: "#304000",
     panel: "rgba(128,230,28,0.14)",
-    cta: "#7be000",
-    accent: "#9cf22d",
+    cta: "#afea00",
+    accent: "#afea00",
     shadow: "rgba(123,224,0,0.32)",
   },
   {
@@ -61,12 +61,12 @@ const themes = [
     className: "theme-cyan",
     baseSrc: "./assets/figma-bases/cyan.png",
     figmaNode: "0:661",
-    bgStart: "#003236",
-    bgMid: "#090909",
-    bgEnd: "#003c3d",
+    bgStart: "#002022",
+    bgMid: "#000000",
+    bgEnd: "#003C40",
     panel: "rgba(34,197,210,0.14)",
-    cta: "#12a8b5",
-    accent: "#50d4df",
+    cta: "#22c7d4",
+    accent: "#22c7d4",
     shadow: "rgba(18,168,181,0.34)",
   },
   {
@@ -75,12 +75,12 @@ const themes = [
     className: "theme-blue",
     baseSrc: "./assets/figma-bases/blue.png",
     figmaNode: "0:772",
-    bgStart: "#001e3d",
-    bgMid: "#00090d",
-    bgEnd: "#00204d",
+    bgStart: "#00253B",
+    bgMid: "#000000",
+    bgEnd: "#00253B",
     panel: "rgba(55,139,255,0.15)",
-    cta: "#147bff",
-    accent: "#62b1ff",
+    cta: "#2479e8",
+    accent: "#2479e8",
     shadow: "rgba(20,123,255,0.34)",
   },
   {
@@ -89,12 +89,12 @@ const themes = [
     className: "theme-purple",
     baseSrc: "./assets/figma-bases/purple.png",
     figmaNode: "0:882",
-    bgStart: "#10002e",
-    bgMid: "#09000d",
-    bgEnd: "#24004d",
+    bgStart: "#060022",
+    bgMid: "#000000",
+    bgEnd: "#0E004D",
     panel: "rgba(139,105,255,0.16)",
-    cta: "#6b54ff",
-    accent: "#a592ff",
+    cta: "#6b4cf6",
+    accent: "#6b4cf6",
     shadow: "rgba(107,84,255,0.34)",
   },
 ];
@@ -612,18 +612,42 @@ function drawPhoneChrome(ctx, theme) {
 }
 
 function drawBackground(ctx, theme) {
-  const gradient = ctx.createLinearGradient(0, 0, 390, 844);
-  gradient.addColorStop(0, theme.bgStart);
-  gradient.addColorStop(0.48, theme.bgMid);
-  gradient.addColorStop(1, theme.bgEnd);
+  const gradient = createFigmaBackgroundGradient(ctx, 390, 844, theme);
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 390, 844);
+}
 
-  const glow = ctx.createRadialGradient(145, 128, 0, 145, 128, 230);
-  glow.addColorStop(0, "rgba(255,255,255,0.11)");
-  glow.addColorStop(1, "rgba(255,255,255,0)");
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, 390, 360);
+function createFigmaBackgroundGradient(ctx, width, height, theme) {
+  const angle = (144.35284658692044 * Math.PI) / 180;
+  const direction = {
+    x: Math.sin(angle),
+    y: -Math.cos(angle),
+  };
+  const corners = [
+    { x: 0, y: 0 },
+    { x: width, y: 0 },
+    { x: 0, y: height },
+    { x: width, y: height },
+  ];
+  const projections = corners.map((point) => point.x * direction.x + point.y * direction.y);
+  const min = Math.min(...projections);
+  const max = Math.max(...projections);
+  const center = {
+    x: width / 2,
+    y: height / 2,
+  };
+  const length = max - min;
+  const gradient = ctx.createLinearGradient(
+    center.x - (direction.x * length) / 2,
+    center.y - (direction.y * length) / 2,
+    center.x + (direction.x * length) / 2,
+    center.y + (direction.y * length) / 2,
+  );
+  gradient.addColorStop(0, theme.bgStart);
+  gradient.addColorStop(0.065618, theme.bgStart);
+  gradient.addColorStop(0.52789, theme.bgMid);
+  gradient.addColorStop(1, theme.bgEnd);
+  return gradient;
 }
 
 function drawAssetSource(ctx, source, theme, options) {
@@ -964,43 +988,37 @@ async function downloadBatchZip() {
 
 function drawThemeCard(theme) {
   const canvas = document.createElement("canvas");
-  canvas.width = 360;
-  canvas.height = 560;
+  canvas.width = 650;
+  canvas.height = 884;
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "#f6f7f9";
+  ctx.fillStyle = "#f4f4f5";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#111827";
-  ctx.font = "700 18px Arial";
-  ctx.fillText(theme.name, 24, 40);
+  ctx.fillStyle = "#000";
+  ctx.font = "700 24px Arial";
+  ctx.fillText(theme.name, 50, 52);
 
-  const colors = [theme.cta, theme.bgStart, theme.bgMid, theme.bgEnd];
-  colors.forEach((color, index) => {
-    const x = 24 + index * 78;
-    ctx.beginPath();
-    ctx.arc(x + 10, 76, 10, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.fillStyle = "#111827";
-    ctx.font = "11px Arial";
-    ctx.fillText(color.toUpperCase(), x, 102);
-  });
-
-  ctx.drawImage(drawThemeBackgroundCanvas(theme), 0, 0, 390, 844, 24, 132, 180, 360);
-
-  roundedRect(ctx, 228, 132, 104, 48, 999);
+  ctx.beginPath();
+  ctx.arc(50, 108, 16, 0, Math.PI * 2);
   ctx.fillStyle = theme.cta;
   ctx.fill();
-  ctx.fillStyle = ctaTextColor(theme);
-  ctx.font = "700 13px Arial";
-  ctx.fillText("CTA", 268, 162);
 
-  roundedRect(ctx, 228, 196, 104, 76, 12);
-  ctx.fillStyle = theme.panel;
-  ctx.fill();
-  ctx.fillStyle = "#111827";
-  ctx.font = "700 12px Arial";
-  ctx.fillText("Panel", 260, 238);
+  const colors = [theme.bgStart, theme.bgMid, theme.bgEnd];
+  colors.forEach((color, index) => {
+    const x = 88 + index * 172;
+    roundedRect(ctx, x, 88, 148, 40, 999);
+    ctx.fillStyle = "#e8e8ea";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 20, 108, 15, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.fillStyle = "#25272d";
+    ctx.font = "14px Arial";
+    ctx.fillText(`Color${index + 1}:${color.toUpperCase()}`, x + 45, 113);
+  });
+
+  ctx.drawImage(drawThemeBackgroundCanvas(theme), 0, 0, 390, 844, 50, 156, 322, 696);
   return canvas;
 }
 
